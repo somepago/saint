@@ -1,9 +1,11 @@
->📋  This repository is the official implementation of
+This repository is the official PyTorch implementation of SAINT. Find the paper on [arxiv](https://arxiv.org/abs/2106.01342) 
 
 # SAINT: Improved Neural Networks for Tabular Data via Row Attention and Contrastive Pre-Training
 
 
 ![Overview](pipeline.png)
+
+
 
 ## Requirements
 
@@ -86,3 +88,15 @@ We would like to thank the following public repo from which we borrowed various 
 
 ## License
 This repository is released under the Apache 2.0 license as found in the [LICENSE](LICENSE) file.
+
+## Cite us
+
+```
+@article{somepalli2021saint,
+  title={SAINT: Improved Neural Networks for Tabular Data via Row Attention and Contrastive Pre-Training},
+  author={Somepalli, Gowthami and Goldblum, Micah and Schwarzschild, Avi and Bruss, C Bayan and Goldstein, Tom},
+  journal={arXiv preprint arXiv:2106.01342},
+  year={2021}
+}
+
+```
