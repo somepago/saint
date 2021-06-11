@@ -65,10 +65,10 @@ def data_download(dataset):
         print("File already exists.")
     else:
         if url is not None:
-            print("Downloading file...")
+            print(f"Downloading {dataset} file...")
             wget.download(url, out.as_posix())
         else:
-            raise 'Download the dataset from the given link first'
+            raise 'Download the dataset from the link mentioned in github first'
         
     if dataset=='1995_income':
         train = pd.read_csv(out,header=None)
@@ -282,7 +282,7 @@ def data_prep(dataset,seed,mask_det=None, datasplit=[.65, .15, .2]):
     X_train, y_train = data_mask_split(X,Y,mask,y_mask,train_indices,mask_det,'train')
     X_valid, y_valid = data_mask_split(X,Y,mask,y_mask,valid_indices,mask_det,'valid')
     X_test, y_test = data_mask_split(X,Y,mask,y_mask,test_indices,mask_det,'test')
-    print(X_train['data'].shape, y_train['data'].shape,X_valid['data'].shape,y_valid['data'].shape,X_test['data'].shape,y_test['data'].shape)
+    # print(X_train['data'].shape, y_train['data'].shape,X_valid['data'].shape,y_valid['data'].shape,X_test['data'].shape,y_test['data'].shape)
     
     train_mean, train_std = np.array(X_train['data'][:,con_idxs],dtype=np.float32).mean(0), np.array(X_train['data'][:,con_idxs],dtype=np.float32).std(0)
     return cat_dims, cat_idxs, con_idxs, X_train, y_train, X_valid, y_valid, X_test, y_test, train_mean, train_std

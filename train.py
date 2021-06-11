@@ -89,7 +89,7 @@ if opt.dataset in ['mnist']:
         opt.embedding_size = 8
 
 
-print(device,opt.embedding_size)
+print(f"Device is {device}.")
 
 modelsave_path = os.path.join(os.getcwd(),opt.savemodelroot,opt.dataset,opt.run_name)
 os.makedirs(modelsave_path, exist_ok=True)
@@ -117,6 +117,7 @@ pt_mask_params = {
         "test_mask": 0
     }
 
+print('Downloading and processing the dataset, it might take some time.')
 if opt.dataset not in ['mnist']:
     cat_dims, cat_idxs, con_idxs, X_train, y_train, X_valid, y_valid, X_test, y_test, train_mean, train_std = data_prep(opt.dataset, opt.set_seed, mask_params)
     continuous_mean_std = np.array([train_mean,train_std]).astype(np.float32) 
@@ -233,6 +234,7 @@ if opt.pretrain:
     }
     criterion1 = nn.CrossEntropyLoss()
     criterion2 = nn.MSELoss()
+    print("Pretraining begins!")
     for epoch in range(opt.pretrain_epochs):
         model.train()
         running_loss = 0.0
@@ -305,6 +307,7 @@ best_valid_accuracy = 0
 best_test_auroc = 0
 best_test_accuracy = 0
 
+print('Training begins now.')
 for epoch in range(opt.epochs):
     model.train()
     running_loss = 0.0

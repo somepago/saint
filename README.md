@@ -46,12 +46,17 @@ conda install -c conda-forge wandb
 
 In each of our experiments, we use a single Nvidia GeForce RTX 2080Ti GPU.
 
-> First download the processed datasets from [this link](https://drive.google.com/file/d/1mJtWP9mRP0a10d1rT6b3ksYkp4XOpM0r/view?usp=sharing) into the folder `./data`
+First download the processed datasets from [this link](https://drive.google.com/file/d/1mJtWP9mRP0a10d1rT6b3ksYkp4XOpM0r/view?usp=sharing) into the folder `./data`
 
 To train the model(s) in the paper, run this command:
 
 ```
 python train.py  --dataset <dataset_name> --attentiontype <attention_type> 
+```
+
+Pretraining is useful when there are few training data samples. Sample code looks like this
+```
+python train.py  --dataset <dataset_name> --attentiontype <attention_type> --pretrain --pt_tasks <pretraining_task_touse> --pt_aug <augmentations_on_data_touse> --ssl_avail_y <Number_of_labeled_samples>
 ```
 
 Train all 16 datasets by running bash files. `train.sh` for supervised learning and `train_pt.sh` for pretraining and semi-supervised learning
@@ -71,7 +76,7 @@ bash train_pt.sh
 * `--pretrain` : To enable pretraining
 * `--pt_tasks` : Losses we want to use for pretraining. Multiple arguments can be passed.
 * `--pt_aug` : Types of data augmentations used in pretraining. Multiple arguments are allowed. We support only mixup and CutMix right now.
-* `--ssl_avail_y` : Number of labeled samples used in semi-supervised experiments.
+* `--ssl_avail_y` : Number of labeled samples used in semi-supervised experiments. Default is 0, which means all samples are labeled and is supervised case.
 * `--pt_projhead_style` : Projection head style used in contrastive pipeline.
 * `--nce_temp` : Temperature used in contrastive loss function.
 * `--active_log` : To update the logs onto wandb. This is optional
