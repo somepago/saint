@@ -22,7 +22,7 @@ parser.add_argument('--transformer_depth', default=6, type=int)
 parser.add_argument('--attention_heads', default=8, type=int)
 parser.add_argument('--attention_dropout', default=0.1, type=float)
 parser.add_argument('--ff_dropout', default=0.1, type=float)
-parser.add_argument('--attentiontype', default='col', type=str,choices = ['col','colrow','row','justmlp','attn','attnmlp'])
+parser.add_argument('--attentiontype', default='colrow', type=str,choices = ['col','colrow','row','justmlp','attn','attnmlp'])
 parser.add_argument('--lr', default=0.0001, type=float)
 parser.add_argument('--epochs', default=100, type=int)
 parser.add_argument('--batchsize', default=256, type=int)
@@ -172,7 +172,7 @@ if opt.dataset not in ['mnist','volkert']:
     heads = opt.attention_heads,                         
     attn_dropout = opt.attention_dropout,             
     ff_dropout = opt.ff_dropout,                  
-    mlp_hidden_mults = (4, 2),       # relative multiples of each hidden dimension of the last mlp to logits
+    mlp_hidden_mults = (4, 2),       
     continuous_mean_std = continuous_mean_std,
     cont_embeddings = opt.cont_embeddings,
     attentiontype = opt.attentiontype,
