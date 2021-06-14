@@ -104,7 +104,7 @@ if opt.active_log:
 
 
 
-
+# mask parameters are used to similate missing data scenrio. Set to default 0s otherwise. (pt_mask_params is for pretraining)
 mask_params = {
     "mask_prob":opt.train_mask_prob,
     "avail_train_y": 0,
@@ -133,7 +133,6 @@ else:
 
 train_bsize = opt.batchsize    
 if opt.ssl_avail_y>0:
-
     train_pts_touse = np.random.choice(X_train['data'].shape[0], opt.ssl_avail_y)
     X_train['data'] = X_train['data'][train_pts_touse,:]
     y_train['data'] = y_train['data'][train_pts_touse]
@@ -150,6 +149,8 @@ validloader = DataLoader(valid_ds, batch_size=opt.batchsize, shuffle=False,num_w
 
 test_ds = DataSetCatCon(X_test, y_test, cat_idxs,continuous_mean_std, is_pretraining=True)
 testloader = DataLoader(test_ds, batch_size=opt.batchsize, shuffle=False,num_workers=4)
+
+# Creating a different dataloader for the pretraining.
 if opt.pretrain:
     if opt.dataset not in ['mnist']:
         _, cat_idxs, _, X_train_pt, y_train_pt, _, _, _, _, train_mean, train_std = data_prep(opt.dataset, opt.set_seed, pt_mask_params)
@@ -162,7 +163,7 @@ if opt.pretrain:
 
 
 if opt.dataset not in ['mnist','volkert']:
-    cat_dims = np.append(np.array(cat_dims),np.array([2])).astype(int)
+    cat_dims = np.append(np.array(cat_dims),np.array([2])).astype(int) # unique values in cat column, with 2 appended in the end as the number of unique values of y. This is the case of binary classification
     model = SAINT(
     categories = tuple(cat_dims), 
     num_continuous = len(con_idxs),                
@@ -173,7 +174,7 @@ if opt.dataset not in ['mnist','volkert']:
     attn_dropout = opt.attention_dropout,             
     ff_dropout = opt.ff_dropout,                  
     mlp_hidden_mults = (4, 2),       
-    continuous_mean_std = continuous_mean_std,
+    continuous_mean_std = continuous_mean_std, 
     cont_embeddings = opt.cont_embeddings,
     attentiontype = opt.attentiontype,
     final_mlp_style = opt.final_mlp_style,
@@ -241,7 +242,8 @@ if opt.pretrain:
         for i, data in enumerate(pt_trainloader, 0):
             optimizer.zero_grad()
             x_categ, x_cont, cat_mask, con_mask = data[0].to(device), data[1].to(device),data[2].to(device),data[3].to(device)
-
+            
+            # embed_data_mask function is used to embed both categorical and continuous data.
             if 'cutmix' in opt.pt_aug:
                 from augmentations import add_noise
                 x_categ_corr, x_cont_corr = add_noise(x_categ,x_cont, noise_params = pt_aug_dict)
@@ -256,32 +258,32 @@ if opt.pretrain:
 
             loss = 0
             if 'contrastive' in opt.pt_tasks:
-                image_features  = model.transformer(x_categ_enc, x_cont_enc)
-                text_features = model.transformer(x_categ_enc_2, x_cont_enc_2)
-                image_features = (image_features / image_features.norm(dim=-1, keepdim=True)).flatten(1,2)
-                text_features = (text_features / text_features.norm(dim=-1, keepdim=True)).flatten(1,2)
+                aug_features_1  = model.transformer(x_categ_enc, x_cont_enc)
+                aug_features_2 = model.transformer(x_categ_enc_2, x_cont_enc_2)
+                aug_features_1 = (aug_features_1 / aug_features_1.norm(dim=-1, keepdim=True)).flatten(1,2)
+                aug_features_2 = (aug_features_2 / aug_features_2.norm(dim=-1, keepdim=True)).flatten(1,2)
                 if opt.pt_projhead_style == 'diff':
-                    image_features = model.pt_mlp(image_features)
-                    text_features = model.pt_mlp2(text_features)
+                    aug_features_1 = model.pt_mlp(aug_features_1)
+                    aug_features_2 = model.pt_mlp2(aug_features_2)
                 elif opt.pt_projhead_style == 'same':
-                    image_features = model.pt_mlp(image_features)
-                    text_features = model.pt_mlp(text_features)
+                    aug_features_1 = model.pt_mlp(aug_features_1)
+                    aug_features_2 = model.pt_mlp(aug_features_2)
                 else:
                     print('Not using projection head')
-                logits_per_image = image_features @ text_features.t()/opt.nce_temp
-                logits_per_text =  text_features @ image_features.t()/opt.nce_temp
-                targets = torch.arange(logits_per_image.size(0)).to(logits_per_image.device)
-                loss_1 = criterion(logits_per_image, targets)
-                loss_2 = criterion(logits_per_text, targets)
+                logits_per_aug1 = aug_features_1 @ aug_features_2.t()/opt.nce_temp
+                logits_per_aug2 =  aug_features_2 @ aug_features_1.t()/opt.nce_temp
+                targets = torch.arange(logits_per_aug1.size(0)).to(logits_per_aug1.device)
+                loss_1 = criterion(logits_per_aug1, targets)
+                loss_2 = criterion(logits_per_aug2, targets)
                 loss   = opt.lam0*(loss_1 + loss_2)/2
             elif 'contrastive_sim' in opt.pt_tasks:
-                image_features  = model.transformer(x_categ_enc, x_cont_enc)
-                text_features = model.transformer(x_categ_enc_2, x_cont_enc_2)
-                image_features = (image_features / image_features.norm(dim=-1, keepdim=True)).flatten(1,2)
-                text_features = (text_features / text_features.norm(dim=-1, keepdim=True)).flatten(1,2)
-                image_features = model.pt_mlp(image_features)
-                text_features = model.pt_mlp2(text_features)
-                c1 = image_features @ text_features.t()
+                aug_features_1  = model.transformer(x_categ_enc, x_cont_enc)
+                aug_features_2 = model.transformer(x_categ_enc_2, x_cont_enc_2)
+                aug_features_1 = (aug_features_1 / aug_features_1.norm(dim=-1, keepdim=True)).flatten(1,2)
+                aug_features_2 = (aug_features_2 / aug_features_2.norm(dim=-1, keepdim=True)).flatten(1,2)
+                aug_features_1 = model.pt_mlp(aug_features_1)
+                aug_features_2 = model.pt_mlp2(aug_features_2)
+                c1 = aug_features_1 @ aug_features_2.t()
                 loss+= opt.lam1*torch.diagonal(-1*c1).add_(1).pow_(2).sum()
             if 'denoising' in opt.pt_tasks:
                 cat_outs, con_outs = model(x_categ_enc_2, x_cont_enc_2)
@@ -313,9 +315,12 @@ for epoch in range(opt.epochs):
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
         optimizer.zero_grad()
+        # x_categ is the the categorical data, with y appended as last feature. x_cont has continuous data. cat_mask is an array of ones same shape as x_categ except for last column(corresponding to y's) set to 0s. con_mask is an array of ones same shape as x_cont. 
         x_categ, x_cont, cat_mask, con_mask = data[0].to(device), data[1].to(device),data[2].to(device),data[3].to(device)
+        # We are converting the data to embeddings in the next step
         _ , x_categ_enc, x_cont_enc = embed_data_mask(x_categ, x_cont, cat_mask, con_mask,model,vision_dset)           
         reps = model.transformer(x_categ_enc, x_cont_enc)
+        # select only the representations corresponding to y and apply mlp on it in the next step to get the predictions.
         y_reps = reps[:,len(cat_dims)-1,:]
         y_outs = model.mlpfory(y_reps)
         loss = criterion(y_outs,x_categ[:,len(cat_dims)-1]) 

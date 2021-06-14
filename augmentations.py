@@ -1,28 +1,9 @@
 import torch
 import numpy as np
 
-# def embed_data(x_categ, x_cont, model,y=None):
-#     device = x_cont.device
-#     x_categ = x_categ + model.categories_offset.type_as(x_categ)
-#     x_categ_enc = model.embeds(x_categ)
-#     n1,n2 = x_cont.shape
-#     if model.cont_embeddings == 'MLP':
-#         x_cont_enc = torch.empty(n1,n2, model.dim)
-#         for i in range(model.num_continuous):
-#             x_cont_enc[:,i,:] = model.simple_MLP[i](x_cont[:,i])
-#     else:
-#         x_cont_enc = x_cont.clone()
-#     if y is not None:
-#         y = model.y_embed(y)
-#         return x_categ, x_cont_enc, y
-
-#     x_cont_enc = x_cont_enc.to(device)
-#     return x_categ, x_categ_enc, x_cont_enc
-
 
 def embed_data_mask(x_categ, x_cont, cat_mask, con_mask,model,vision_dset=False):
     device = x_cont.device
-    # import ipdb; ipdb.set_trace()
     x_categ = x_categ + model.categories_offset.type_as(x_categ)
     x_categ_enc = model.embeds(x_categ)
     n1,n2 = x_cont.shape
@@ -92,30 +73,3 @@ def add_noise(x_categ,x_cont, noise_params = {'noise_type' : ['cutmix'],'lambda'
         return x_categ_corr, x_cont_corr
     elif noise_params['noise_type'] == 'gauss':
         print("yet to write this")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # elif self.cont_embeddings == 'FF':
-    #     x_cont_enc = ff_encodings(x_cont, self.B.to(device))
-    #     x = self.transformer(x_categ,x_cont_enc.to(device))

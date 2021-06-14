@@ -7,7 +7,7 @@ from pathlib import Path
 from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import Dataset
 
-
+# use this class for uci/ kaggle datasets.
 def data_download(dataset):
     url= None
     if dataset=='1995_income':
@@ -112,19 +112,12 @@ def data_download(dataset):
         train = pd.read_csv(out,header=None,skiprows=1)
     return train, target
 
+
+#use this class only for automl datasets since dataset format is different.
 def data_prep_automl(dataset, datasplit=[.65, .15, .2]):
-    if dataset=='adult':
-        url = 'http://www.causality.inf.ethz.ch/AutoML/adult.zip'
-        dataset_name = 'adult'
-    elif dataset == 'albert':
-        url = 'http://www.causality.inf.ethz.ch/AutoML/albert.zip'
-        dataset_name = 'albert'
-    elif dataset == 'philippine':
+    if dataset == 'philippine':
         url = 'http://www.causality.inf.ethz.ch/AutoML/philippine.zip'
         dataset_name = 'philippine'
-    elif dataset == 'jasmine':
-        url = 'http://www.causality.inf.ethz.ch/AutoML/jasmine.zip'
-        dataset_name = 'jasmine'
     elif dataset == 'volkert':
         url = 'http://www.causality.inf.ethz.ch/AutoML/volkert.zip'
         dataset_name = 'volkert'
@@ -244,7 +237,7 @@ def data_prep(dataset,seed,mask_det=None, datasplit=[.65, .15, .2]):
         con_idxs = list(set(range(len(features))) - set(cat_idxs))
         cat_dims = [ categorical_dims[f] for i, f in enumerate(features) if f in categorical_columns]
         train[target] = train[target].astype(int) 
-    elif dataset in ['adult','albert','philippine','jasmine','volkert']:
+    elif dataset in ['philippine','volkert']:
         train, data_types = data_prep_automl(dataset)
         temp = train.fillna("ThisisNan")
         target = 'target'
