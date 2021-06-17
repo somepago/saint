@@ -10,6 +10,6 @@ declare -a StringArray=('1995_income' 'bank_marketing' 'qsar_bio' 'online_shoppe
 for value in "${StringArray[@]}";
 do
 
-python train.py train.py --dataset $value  --attentiontype $attn  --active_log --run_name nopt_${attn}
+python train.py --dataset $value  --attentiontype $attn  --active_log --run_name nopt_${attn}
 done
 done
