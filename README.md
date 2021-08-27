@@ -20,7 +20,7 @@ conda activate saint_env
 
 We recommend installing the latest pytorch, torchvision, einops, pandas, wget, sklearn packages.
 
-You can install them using 
+You can install them using:-
 
 ```
 conda install pytorch torchvision -c pytorch
@@ -30,13 +30,13 @@ conda install -c conda-forge python-wget
 conda install -c anaconda scikit-learn 
 ``` 
 
-Make sure the following requirements are met
+Make sure the following requirements are met:
 
 * torch>=1.8.1
 * torchvision>=0.9.1
 
 ### Optional
-We used wandb to update our logs. But it is optional.
+We used wandb to update our logs, but it is optional.
 ```
 conda install -c conda-forge wandb 
 ```
@@ -54,12 +54,12 @@ To train the model(s) in the paper, run this command:
 python train.py  --dataset <dataset_name> --attentiontype <attention_type> 
 ```
 
-Pretraining is useful when there are few training data samples. Sample code looks like this
+Pretraining is useful when there are few training data samples. Sample code looks like this:
 ```
 python train.py  --dataset <dataset_name> --attentiontype <attention_type> --pretrain --pt_tasks <pretraining_task_touse> --pt_aug <augmentations_on_data_touse> --ssl_avail_y <Number_of_labeled_samples>
 ```
 
-Train all 16 datasets by running bash files. `train.sh` for supervised learning and `train_pt.sh` for pretraining and semi-supervised learning
+Train all 16 datasets by running bash files. `train.sh` for supervised learning and `train_pt.sh` for pretraining and semi-supervised learning.
 
 ```
 bash train.sh
@@ -83,7 +83,7 @@ bash train_pt.sh
 
 ### Evaluation
 
-We choose the best model by evaluating the model on validation dataset. The AUROC(for binary classification datasets) and Accuracy (for multiclass classification datasets) of the best model on test datasets is printed after training is completed. If wandb is enabled, they are logged to 'test_auroc_bestep', 'test_accuracy_bestep'  variables.
+We choose the best model by evaluating the model on the validation dataset. The AUROC (for binary classification datasets) and Accuracy (for multiclass classification datasets) of the best model on test datasets is printed after training is completed. If wandb is enabled, they are logged to 'test_auroc_bestep' and 'test_accuracy_bestep'  variables.
 
 
 ## Acknowledgements
