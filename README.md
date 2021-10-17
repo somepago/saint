@@ -63,9 +63,17 @@ python train_robust.py --dset_id <openml_dataset_id> --task <task_name> --attent
 * `--nce_temp` : Temperature used in contrastive loss function.
 * `--active_log` : To update the logs onto wandb. This is optional
 
+#### <span style="color:Tomato">Most of the hyperparameters are hardcoded in train.py file. For datasets with really high number of features, we suggest using smaller batchsize, lower embedding dimension and fewer number of heads.</span>
+
 ### Evaluation
 
 We choose the best model by evaluating the model on validation dataset. The AuROC(for binary classification datasets), Accuracy (for multiclass classification datasets), and RMSE (for regression datasets) of the best model on test datasets is printed after training is completed. If wandb is enabled, they are logged to 'test_auroc_bestep', 'test_accuracy_bestep', 'test_rmse_bestep'  variables.
+
+
+
+## What's new in this version?
+* Regression and multiclass classification models are added.
+* Data can be accessed directly from openml just by calling the id of the dataset.
 
 
 ## Acknowledgements
