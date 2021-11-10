@@ -34,7 +34,7 @@ parser.add_argument('--batchsize', default=256, type=int)
 parser.add_argument('--savemodelroot', default='./bestmodels', type=str)
 parser.add_argument('--run_name', default='testrun', type=str)
 parser.add_argument('--set_seed', default= 1 , type=int)
-parser.add_argument('--dset_seed', default= 1 , type=int)
+parser.add_argument('--dset_seed', default= 5 , type=int)
 parser.add_argument('--active_log', action = 'store_true')
 
 parser.add_argument('--pretrain', action = 'store_true')
@@ -91,7 +91,7 @@ continuous_mean_std = np.array([train_mean,train_std]).astype(np.float32)
 ##### Setting some hyperparams based on inputs and dataset
 _,nfeat = X_train['data'].shape
 if nfeat > 100:
-    opt.embedding_size = min(4,opt.embedding_size)
+    opt.embedding_size = min(8,opt.embedding_size)
     opt.batchsize = min(64, opt.batchsize)
 if opt.attentiontype != 'col':
     opt.transformer_depth = 1
